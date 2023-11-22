@@ -10,19 +10,19 @@ GRAVITY :: 10
 JUMP_SPEED :: -200
 
 Player :: struct {
-	pos:  rl.Vector2,
 	vel:  rl.Vector2,
-	rect: rl.Rectangle, // used for collision detection
+	rect: rl.Rectangle,
 }
 
 Placement :: enum {
+	RIGHT,
+	LEFT,
 	TOP,
-	MIDDLE,
 	BOTTOM,
 }
 
 setup_player :: proc(pos: rl.Vector2) -> Player {
-	return {pos, {0, 0}, {pos.x, pos.y, 40, TILE_SIZE}}
+	return {{0, 0}, {pos.x, pos.y, 40, TILE_SIZE}}
 }
 
 draw_player :: proc(using player: Player) {
@@ -43,15 +43,13 @@ get_input :: proc(using player: ^Player) {
 }
 
 update_player :: proc(using player: ^Player) {
-	rect.x = pos.x
-	rect.y = pos.y
 	draw_player(player^)
 	get_input(player)
-	player.pos += player.vel * {rl.GetFrameTime(), rl.GetFrameTime()}
 }
 
 apply_gravity :: proc(using player: ^Player) {
 	vel.y += GRAVITY
+	rect.y += vel.y * rl.GetFrameTime()
 }
 
 jump :: proc(using player: ^Player) {
@@ -60,11 +58,17 @@ jump :: proc(using player: ^Player) {
 
 place_player :: proc(using player: ^Player, new_pos: rl.Vector2, placement: Placement) {
 	switch placement {
+	case .LEFT:
+		rect.y = new_pos.y
+		rect.x = new_pos.x
+	case .RIGHT:
+		rect.y = new_pos.y
+		rect.x = new_pos.x - rect.width
 	case .TOP:
-		pos = new_pos
-	case .MIDDLE:
-		pos = {new_pos.x, new_pos.y - player.rect.y / 2}
+		rect.x = new_pos.x
+		rect.y = new_pos.y
 	case .BOTTOM:
-		pos = {new_pos.x, new_pos.y - player.rect.height}
+		rect.x = new_pos.x
+		rect.y = new_pos.y - player.rect.height
 	}
 }

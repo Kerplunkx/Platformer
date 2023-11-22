@@ -9,7 +9,7 @@ main :: proc() {
 
 	level := setup_level(map_data)
 	camera := rl.Camera2D {
-		target = level.player.pos,
+		target = {level.player.rect.x, level.player.rect.y},
 		offset = {WINDOW_WIDTH / 2, f32(WINDOW_HEIGHT) / 4},
 		rotation = 0,
 		zoom = 1,
@@ -22,8 +22,7 @@ main :: proc() {
 		rl.BeginMode2D(camera)
 		run_level(&level, &camera)
 		rl.EndMode2D()
-		debug(level.player.vel, level.player.pos)
-
+		debug(level.player.vel, {level.player.rect.x, level.player.rect.y})
 	}
 }
 

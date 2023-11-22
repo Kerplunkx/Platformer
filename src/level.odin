@@ -39,12 +39,12 @@ run_level :: proc(level: ^Level, camera: ^rl.Camera2D) {
 	update_player(&level.player)
 	update_camera(level.player, camera)
 	check_vertical_collision(level)
-	// check_horizontal_collision(level)
+	check_horizontal_collision(level)
 }
 
 update_camera :: proc(player: Player, camera: ^rl.Camera2D) {
 	camera.offset = {WINDOW_WIDTH / 2, f32(WINDOW_HEIGHT) / 4}
-	camera.target = player.pos
+	camera.target = {player.rect.x, player.rect.y}
 }
 
 check_vertical_collision :: proc(using level: ^Level) {
@@ -52,26 +52,22 @@ check_vertical_collision :: proc(using level: ^Level) {
 	for tile in tiles {
 		if rl.CheckCollisionRecs(tile, player.rect) {
 			if player.vel.y > 0 {
-				place_player(&player, {player.pos.x, tile.y}, .BOTTOM)
-				player.vel.y = 0
-			}
-			if player.vel.y < 0 {
-				place_player(&player, {player.pos.x, tile.y + tile.width}, .TOP)
-				player.vel.y = 0
+				place_player(&player, {player.rect.x, tile.y}, .BOTTOM)
+			} else if player.vel.y < 0 {
+				place_player(&player, {player.rect.x, tile.y + tile.height}, .TOP)
 			}
 		}
 	}
 }
 
 check_horizontal_collision :: proc(using level: ^Level) {
+	player.rect.x += player.vel.x * rl.GetFrameTime()
 	for tile in tiles {
 		if rl.CheckCollisionRecs(tile, player.rect) {
 			if player.vel.x > 0 {
-				place_player(&player, {tile.x - player.pos.x, player.pos.y}, .TOP)
-				player.vel.x = 0
+				place_player(&player, {tile.x, player.rect.y}, .RIGHT)
 			} else if player.vel.x < 0 {
-				place_player(&player, {tile.x + tile.width, player.pos.y}, .TOP)
-				player.vel.x = 0
+				place_player(&player, {tile.x + tile.width, player.rect.y}, .LEFT)
 			}
 		}
 	}
