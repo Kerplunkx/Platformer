@@ -1,5 +1,7 @@
 package main
 
+import "core:fmt"
+import "utils"
 import rl "vendor:raylib"
 
 main :: proc() {
@@ -7,7 +9,8 @@ main :: proc() {
 	defer rl.CloseWindow()
 	rl.SetTargetFPS(60)
 
-	level := setup_level(map_data)
+	level := level_setup(map_data)
+	defer level_deinit(level)
 	camera := rl.Camera2D {
 		target = {level.player.rect.x, level.player.rect.y},
 		offset = {WINDOW_WIDTH / 2, f32(WINDOW_HEIGHT) / 4},
@@ -20,7 +23,7 @@ main :: proc() {
 		defer rl.EndDrawing()
 		rl.ClearBackground(rl.BLACK)
 		rl.BeginMode2D(camera)
-		run_level(&level, &camera)
+		level_run(&level, &camera)
 		rl.EndMode2D()
 		debug(level.player.vel, {level.player.rect.x, level.player.rect.y})
 	}
